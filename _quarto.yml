@@ -1,0 +1,27 @@
+project:
+  type: website
+  output-dir: docs
+
+website:
+  title: "2025융합과제탐구"
+  navbar:
+    left:      
+      - href: index.qmd
+        text: Home
+      - href: project_1.ipynb
+        text: project_1
+      - href: project_2.ipynb
+        text: project_2
+      - href: project_titanic.ipynb
+        text: project_titanic
+      - about.qmd
+
+format:
+  html:
+    theme:
+      - cerulean
+    css: styles.css
+    toc: true
+
+
+
