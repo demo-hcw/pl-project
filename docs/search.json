@@ -1,0 +1,100 @@
+[
+  {
+    "objectID": "project_titanic.html",
+    "href": "project_titanic.html",
+    "title": "타이타닉 데이터 분석",
+    "section": "",
+    "text": "RMS 타이타닉은 영국의 화이트 스타 라인이 운영한 북대서양 횡단 여객선으로, 1912년 4월 10일 첫 출항하였다. 영국의 사우샘프턴을 떠나 미국의 뉴욕으로 향하던 중에 4월 15일 빙산과 충돌하여 침몰하였으며, 이로 인해 1,514명이 사망한 것으로 알려져 있다.\n타이타닉 데이터를 분석하여 생존에 영향을 준 요인을 파악하고, 이를 바탕으로 생존 여부를 예측하는 모델을 학습해보자.\nimport seaborn as sns\nimport matplotlib.pyplot as plt\nimport numpy as np\nimport pandas as pd\n#데이터 불러오기\ndf=sns.load_dataset('titanic')\ndf.head()\n\n\n\n\n\n\n\n\nsurvived\npclass\nsex\nage\nsibsp\nparch\nfare\nembarked\nclass\nwho\nadult_male\ndeck\nembark_town\nalive\nalone\n\n\n\n\n0\n0\n3\nmale\n22.0\n1\n0\n7.2500\nS\nThird\nman\nTrue\nNaN\nSouthampton\nno\nFalse\n\n\n1\n1\n1\nfemale\n38.0\n1\n0\n71.2833\nC\nFirst\nwoman\nFalse\nC\nCherbourg\nyes\nFalse\n\n\n2\n1\n3\nfemale\n26.0\n0\n0\n7.9250\nS\nThird\nwoman\nFalse\nNaN\nSouthampton\nyes\nTrue\n\n\n3\n1\n1\nfemale\n35.0\n1\n0\n53.1000\nS\nFirst\nwoman\nFalse\nC\nSouthampton\nyes\nFalse\n\n\n4\n0\n3\nmale\n35.0\n0\n0\n8.0500\nS\nThird\nman\nTrue\nNaN\nSouthampton\nno\nTrue\ndf.info()\n\n&lt;class 'pandas.core.frame.DataFrame'&gt;\nRangeIndex: 891 entries, 0 to 890\nData columns (total 15 columns):\n #   Column       Non-Null Count  Dtype   \n---  ------       --------------  -----   \n 0   survived     891 non-null    int64   \n 1   pclass       891 non-null    int64   \n 2   sex          891 non-null    object  \n 3   age          714 non-null    float64 \n 4   sibsp        891 non-null    int64   \n 5   parch        891 non-null    int64   \n 6   fare         891 non-null    float64 \n 7   embarked     889 non-null    object  \n 8   class        891 non-null    category\n 9   who          891 non-null    object  \n 10  adult_male   891 non-null    bool    \n 11  deck         203 non-null    category\n 12  embark_town  889 non-null    object  \n 13  alive        891 non-null    object  \n 14  alone        891 non-null    bool    \ndtypes: bool(2), category(2), float64(2), int64(4), object(5)\nmemory usage: 80.7+ KB\n#데이터 전처리:결측값 확인\ndf.isna().sum()\n\nsurvived         0\npclass           0\nsex              0\nage            177\nsibsp            0\nparch            0\nfare             0\nembarked         2\nclass            0\nwho              0\nadult_male       0\ndeck           688\nembark_town      2\nalive            0\nalone            0\ndtype: int64"
+  },
+  {
+    "objectID": "project_titanic.html#중복-데이터-선택",
+    "href": "project_titanic.html#중복-데이터-선택",
+    "title": "타이타닉 데이터 분석",
+    "section": "중복 데이터 선택",
+    "text": "중복 데이터 선택\n\ndata=df.copy()\ndata=data.drop(columns=['alive','class','who','sex','embark_town'])\ndata.head()\n\n\n\n\n\n\n\n\nsurvived\npclass\nage\nsibsp\nparch\nfare\nembarked\nadult_male\ndeck\nalone\n\n\n\n\n0\n0\n3\n22.0\n1\n0\n7.2500\nS\nTrue\nNaN\nFalse\n\n\n1\n1\n1\n38.0\n1\n0\n71.2833\nC\nFalse\nC\nFalse\n\n\n2\n1\n3\n26.0\n0\n0\n7.9250\nS\nFalse\nNaN\nTrue\n\n\n3\n1\n1\n35.0\n1\n0\n53.1000\nS\nFalse\nC\nFalse\n\n\n4\n0\n3\n35.0\n0\n0\n8.0500\nS\nTrue\nNaN\nTrue"
+  },
+  {
+    "objectID": "project_titanic.html#결측값-처리",
+    "href": "project_titanic.html#결측값-처리",
+    "title": "타이타닉 데이터 분석",
+    "section": "결측값 처리",
+    "text": "결측값 처리\n\n# deck:갚판 데이터는 결측값이 너무 많아 의미 없다 판단함\ndata=data.drop(columns='deck')\ndata.describe()\n\n\n\n\n\n\n\n\nsurvived\npclass\nage\nsibsp\nparch\nfare\n\n\n\n\ncount\n891.000000\n891.000000\n714.000000\n891.000000\n891.000000\n891.000000\n\n\nmean\n0.383838\n2.308642\n29.699118\n0.523008\n0.381594\n32.204208\n\n\nstd\n0.486592\n0.836071\n14.526497\n1.102743\n0.806057\n49.693429\n\n\nmin\n0.000000\n1.000000\n0.420000\n0.000000\n0.000000\n0.000000\n\n\n25%\n0.000000\n2.000000\n20.125000\n0.000000\n0.000000\n7.910400\n\n\n50%\n0.000000\n3.000000\n28.000000\n0.000000\n0.000000\n14.454200\n\n\n75%\n1.000000\n3.000000\n38.000000\n1.000000\n0.000000\n31.000000\n\n\nmax\n1.000000\n3.000000\n80.000000\n8.000000\n6.000000\n512.329200\n\n\n\n\n\n\n\n\n#S( Southampton)에서 사람이 제일 많았다\ncnd=data['embarked'].value_counts()\npd.DataFrame(cnd)\n\n\n\n\n\n\n\n\ncount\n\n\nembarked\n\n\n\n\n\nS\n644\n\n\nC\n168\n\n\nQ\n77\n\n\n\n\n\n\n\n\n#결측값인 탑승항구는 제일 사람이 많았던 Southampton으로 처리하고, age는 중앙값과 평균값의 사이인 29살로 처리함\ndata['age']=data['age'].fillna(29)\ndata['embarked']=data['embarked'].fillna('S')\ndata.isna().sum()\n\nsurvived      0\npclass        0\nage           0\nsibsp         0\nparch         0\nfare          0\nembarked      0\nadult_male    0\nalone         0\ndtype: int64\n\n\n\n#데이터를 자료형에서 숫자형으로 바꾼다\ndict_em={'S':0,'C':1,'Q':2}\ndict_ma={False:0,True:1}\ndict_al={False:0,True:1}\ndata['embarked'] = data['embarked'].map(dict_em)\ndata['adult_male'] = data['adult_male'].map(dict_ma)\ndata['alone'] = data['alone'].map(dict_al)\ndata.head()\n\n\n\n\n\n\n\n\nsurvived\npclass\nage\nsibsp\nparch\nfare\nembarked\nadult_male\nalone\n\n\n\n\n0\n0\n3\n22.0\n1\n0\n7.2500\n0\n1\n0\n\n\n1\n1\n1\n38.0\n1\n0\n71.2833\n1\n0\n0\n\n\n2\n1\n3\n26.0\n0\n0\n7.9250\n0\n0\n1\n\n\n3\n1\n1\n35.0\n1\n0\n53.1000\n0\n0\n0\n\n\n4\n0\n3\n35.0\n0\n0\n8.0500\n0\n1\n1"
+  },
+  {
+    "objectID": "project_titanic.html#학습평가-데이터-분할",
+    "href": "project_titanic.html#학습평가-데이터-분할",
+    "title": "타이타닉 데이터 분석",
+    "section": "학습/평가 데이터 분할",
+    "text": "학습/평가 데이터 분할\n\n학습 데이터와 평가 데이터를 7:3 비율로 분할\n\n\nX=data.drop(columns='survived')   # feature\ny=data['survived']# target\nfrom sklearn.model_selection import train_test_split\nX_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.3,random_state=42)\n\n\nX_train.info()\n\n&lt;class 'pandas.core.frame.DataFrame'&gt;\nIndex: 623 entries, 445 to 102\nData columns (total 8 columns):\n #   Column      Non-Null Count  Dtype  \n---  ------      --------------  -----  \n 0   pclass      623 non-null    int64  \n 1   age         623 non-null    float64\n 2   sibsp       623 non-null    int64  \n 3   parch       623 non-null    int64  \n 4   fare        623 non-null    float64\n 5   embarked    623 non-null    int64  \n 6   adult_male  623 non-null    int64  \n 7   alone       623 non-null    int64  \ndtypes: float64(2), int64(6)\nmemory usage: 43.8 KB\n\n\n\ncorr_df=data.corr()\ndf_up=np.triu(corr_df)\nsns.heatmap(corr_df,mask=df_up, annot=True, cmap='RdYlBu', vmin=-1, vmax=1)\nplt.show()\n\n\n\n\n\n\n\n\n\n히트맵으로 보아 생존률은 pclass(객실 등급)가 높을 수록, fare(요금)가 높을 수록, 혼자 탄 사람일 때,남성이 아닐 때 높은 것을 보인다.\nemabarked(탑승 항구)는 상관관계가 있는 것으로 보이나 생존과는 인과관계가 없는 것으로 보이므로 배제한다\n객실 등급과 요금은 안전 요원이나 선원의 도움을 많이 받았을 것으로 예측된다\n남성이 아닌 경우에는 위험 상황일 때 여성이나 아동을 먼저 구출하는 영향으로 인한 것으로 보인다\n혼자 탄 사람인 경우에는 대피시에 그렇지 않은 사람보다 신경 쓸게 상대적으로 적어서 그런 것으로 보인다\n따라서 중위 주택 가격을 예측하는 특성(feature)으로 해당 변수를 선택했다"
+  },
+  {
+    "objectID": "project_titanic.html#회귀모델-학습-및-평가",
+    "href": "project_titanic.html#회귀모델-학습-및-평가",
+    "title": "타이타닉 데이터 분석",
+    "section": "회귀모델 학습 및 평가",
+    "text": "회귀모델 학습 및 평가\n\n#최적의 k 값 선택\nfrom sklearn.neighbors import KNeighborsClassifier\nfrom sklearn.model_selection import cross_val_score\n\nk_range = range(1, 70)\nk_scores=[]\n\nfor k in k_range:\n    knn = KNeighborsClassifier(n_neighbors=k)\n    scores=cross_val_score(knn, X_train, y_train, cv=5, scoring='accuracy')\n    k_scores.append(scores.mean())\n    print(f'k={k}일때 정확도 : {scores.mean(): .3f}')\n\nk=1일때 정확도 :  0.664\nk=2일때 정확도 :  0.668\nk=3일때 정확도 :  0.677\nk=4일때 정확도 :  0.671\nk=5일때 정확도 :  0.679\nk=6일때 정확도 :  0.695\nk=7일때 정확도 :  0.714\nk=8일때 정확도 :  0.684\nk=9일때 정확도 :  0.703\nk=10일때 정확도 :  0.700\nk=11일때 정확도 :  0.697\nk=12일때 정확도 :  0.700\nk=13일때 정확도 :  0.708\nk=14일때 정확도 :  0.698\nk=15일때 정확도 :  0.701\nk=16일때 정확도 :  0.722\nk=17일때 정확도 :  0.709\nk=18일때 정확도 :  0.706\nk=19일때 정확도 :  0.695\nk=20일때 정확도 :  0.703\nk=21일때 정확도 :  0.703\nk=22일때 정확도 :  0.705\nk=23일때 정확도 :  0.701\nk=24일때 정확도 :  0.701\nk=25일때 정확도 :  0.700\nk=26일때 정확도 :  0.700\nk=27일때 정확도 :  0.689\nk=28일때 정확도 :  0.676\nk=29일때 정확도 :  0.684\nk=30일때 정확도 :  0.679\nk=31일때 정확도 :  0.685\nk=32일때 정확도 :  0.682\nk=33일때 정확도 :  0.685\nk=34일때 정확도 :  0.681\nk=35일때 정확도 :  0.689\nk=36일때 정확도 :  0.673\nk=37일때 정확도 :  0.679\nk=38일때 정확도 :  0.679\nk=39일때 정확도 :  0.682\nk=40일때 정확도 :  0.676\nk=41일때 정확도 :  0.689\nk=42일때 정확도 :  0.682\nk=43일때 정확도 :  0.682\nk=44일때 정확도 :  0.674\nk=45일때 정확도 :  0.679\nk=46일때 정확도 :  0.676\nk=47일때 정확도 :  0.676\nk=48일때 정확도 :  0.679\nk=49일때 정확도 :  0.676\nk=50일때 정확도 :  0.674\nk=51일때 정확도 :  0.677\nk=52일때 정확도 :  0.671\nk=53일때 정확도 :  0.673\nk=54일때 정확도 :  0.666\nk=55일때 정확도 :  0.674\nk=56일때 정확도 :  0.665\nk=57일때 정확도 :  0.668\nk=58일때 정확도 :  0.661\nk=59일때 정확도 :  0.666\nk=60일때 정확도 :  0.660\nk=61일때 정확도 :  0.669\nk=62일때 정확도 :  0.663\nk=63일때 정확도 :  0.668\nk=64일때 정확도 :  0.668\nk=65일때 정확도 :  0.663\nk=66일때 정확도 :  0.666\nk=67일때 정확도 :  0.663\nk=68일때 정확도 :  0.673\nk=69일때 정확도 :  0.668\n\n\n\n# 모델 성능이 가장 좋은 k 값 선택\nbest_k = k_range[k_scores.index(max(k_scores))]\nprint(f\"최적의 k 값은 {best_k}이며, 평균 정확도는 {max(k_scores):.3f}\")\n\n최적의 k 값은 16이며, 평균 정확도는 0.722\n\n\n\n# K-NN 분류모델 생성 및 학습\nknn = KNeighborsClassifier(n_neighbors=best_k)\nknn.fit(X_train,y_train)\n\n#학습 데이터로 학습한  회귀모델에 평가데이터를 입력하여 클래스 분류\ny_pred = knn.predict(X_test)\n\n\n#분류모델 평가 : 정확도, 정밀도, 재현도\nfrom sklearn.metrics import accuracy_score, precision_score, recall_score\ny_pred = knn.predict(X_test)\naccuracy = accuracy_score(y_test, y_pred)\nprecision = precision_score(y_test, y_pred, average='micro')\nrecall = recall_score(y_test, y_pred, average='micro')\n\nprint(f\"정확도 : {accuracy:.3f}\")\nprint(f\"정밀도 : {accuracy:.3f}\")\nprint(f\"재현도 : {accuracy:.3f}\")\n\n정확도 : 0.709\n정밀도 : 0.709\n재현도 : 0.709"
+  },
+  {
+    "objectID": "project_1.html#학습평가-데이터-분할",
+    "href": "project_1.html#학습평가-데이터-분할",
+    "title": "Project1 : 캘리포니아 주택 가격 분석",
+    "section": "3.학습/평가 데이터 분할",
+    "text": "3.학습/평가 데이터 분할\n\n학습 데이터와 평가 데이터를 7:3 비율로 분할\n\n\nX=data.data   # feature\ny=data.target # target\nfrom sklearn.model_selection import train_test_split\nX_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.3,random_state=42)"
+  },
+  {
+    "objectID": "project_1.html#데이터-탐색",
+    "href": "project_1.html#데이터-탐색",
+    "title": "Project1 : 캘리포니아 주택 가격 분석",
+    "section": "4.데이터 탐색",
+    "text": "4.데이터 탐색\n\n# 요약 통계량\ndf_train=pd.concat([X_train, y_train], axis=1)\ndf_train.describe()\n#평균 중위 주택 가격은 20만 달러\n#중위 주택 가격의 중간값은 17만9천달러\n#최솟값은 1만4천달러\n#1사분위수는 11만9천달러\n#3사분위수는 26만달러\n#최댓값은 50만달러\n\n\n\n\n\n\n\n\nMedInc\nHouseAge\nAveRooms\nAveBedrms\nPopulation\nAveOccup\nLatitude\nLongitude\nMedHouseVal\n\n\n\n\ncount\n14448.000000\n14448.000000\n14448.000000\n14448.000000\n14448.000000\n14448.000000\n14448.000000\n14448.000000\n14448.000000\n\n\nmean\n3.876892\n28.575374\n5.438125\n1.098033\n1427.927326\n3.119236\n35.650669\n-119.584102\n2.069240\n\n\nstd\n1.904908\n12.613634\n2.453569\n0.447498\n1140.225190\n12.373636\n2.135742\n2.002930\n1.157492\n\n\nmin\n0.499900\n1.000000\n0.888889\n0.333333\n3.000000\n0.692308\n32.550000\n-124.350000\n0.149990\n\n\n25%\n2.567225\n18.000000\n4.448928\n1.006783\n791.000000\n2.430380\n33.940000\n-121.800000\n1.193000\n\n\n50%\n3.539100\n29.000000\n5.232422\n1.049492\n1168.000000\n2.817147\n34.270000\n-118.510000\n1.793000\n\n\n75%\n4.758075\n37.000000\n6.060692\n1.100328\n1727.000000\n3.279135\n37.720000\n-118.010000\n2.646000\n\n\nmax\n15.000100\n52.000000\n141.909091\n25.636364\n35682.000000\n1243.333333\n41.950000\n-114.310000\n5.000010\n\n\n\n\n\n\n\n\ndf.info()\n\n\n#데이터 전처리:결측값 확인\ndf.isna().sum()\n\nMedInc         0\nHouseAge       0\nAveRooms       0\nAveBedrms      0\nPopulation     0\nAveOccup       0\nLatitude       0\nLongitude      0\nMedHouseVal    0\ndtype: int64\n\n\n\n#중위 주택 가격의 분포\nsns.histplot(df_train['MedHouseVal'], color='purple', alpha=0.8)\nplt.show()\n\n\n\n\n\n\n\n\n\nplt.figure(figsize=(7,1))\nsns.boxplot(x=df_train['MedHouseVal'], vert=False)                   # 아주 많다\nplt.show()                                                           #    |\n#초과 이상값이 아주 많이 존재 한다                                         v  \n\n\n\n\n\n\n\n\n\nsns.pairplot(df_train,height=0.8, plot_kws={'s':5}, diag_kind='kde')\nplt.show()\n\n\n\n\n\n\n\n\n\ncorr_df=df_train.corr()\ndf_up=np.triu(corr_df)\nsns.heatmap(corr_df,mask=df_up, annot=True, cmap='RdYlBu', vmin=-1, vmax=1)\nplt.show()\n\n\n\n\n\n\n\n\n\n히트맵으로 보아 지역 중위 소득은 중위 주택 가격과 강한 양의 상관관계를 가지고, 방의 개수, 주택의 연식과 약한 양의 상관관계를 가짐.\n나머지는 중위 주택 가격과 상관관계를 가지지 않음.\n따라서 중위 주택 가격을 예측하는 특성(feature)으로 해당 변수를 선택함.\n추가로, 중위 소득이 높으면 더많은 방을 가짐."
+  },
+  {
+    "objectID": "project_1.html#회귀모델-학습-및-평가",
+    "href": "project_1.html#회귀모델-학습-및-평가",
+    "title": "Project1 : 캘리포니아 주택 가격 분석",
+    "section": "5.회귀모델 학습 및 평가",
+    "text": "5.회귀모델 학습 및 평가\n\n#상관관계가 존재하는 특성(object) 선택\nfeatures=['MedInc','HouseAge','AveRooms','Latitude']\n\nX_train=df_train[features]  #2차원 배열\n\n\nfrom sklearn.linear_model import LinearRegression\nmodel = LinearRegression()\nmodel.fit(X_train,y_train);\n\n#회기계수(regression coefficient)\npd.DataFrame({'Feature':features, 'Coefficient':model.coef_})\n\n\n\n\n\n\n\n\nFeature\nCoefficient\n\n\n\n\n0\nMedInc\n0.435658\n\n\n1\nHouseAge\n0.016937\n\n\n2\nAveRooms\n-0.019505\n\n\n3\nLatitude\n-0.045071\n\n\n\n\n\n\n\n\n특성(feature)가 중위 주택 가격(target)에 미치는 영향은 다음과 같음 +지역 중위 소득이 1만 달러\n\n\n#평가 데이터에서도 학습 데이터에서 사용한 독립변수만 선택\nX_test=X_test[features]\n\n#학습 데이터를 학습한  회귀모델에 평가데이터를 입력하여 예측값 계산\ny_pred =model.predict(X_test)\n\n# 평가 데이터의 실제 관측값과 예측값과 비교하여 모델을 평가: RMSE, 결정계수\nfrom sklearn.metrics import mean_squared_error, r2_score\nRMSE = np.sqrt(mean_squared_error(y_test, y_pred))\nR2 = r2_score(y_test,y_pred)\n\nprint(f'RMSE:{RMSE:.3f}')\nprint(f'결정계수:{R2:.3f}')\n\nRMSE:0.794\n결정계수:0.520\n\n\n\nRMSE는 0.794으로, 주택 중위 가격의 실제값과 예측값이 평균적으로 약 8만 달러 차이가 있다는 것을 의미함\n학습 데이터에서 주택 중위 가격의 평균은 약 20만 달러인 점을 고려하면, 모델의 평균 오차는 약 25% 수준임을 알 수 있음\n따라서 평균 오차가 비교적 큰 편이므로, 모델 성능 개선이 필요한 것으로 판단됨\n결정계수는 52%로 나타남"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site"
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "qwerty-project",
+    "section": "",
+    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites."
+  },
+  {
+    "objectID": "project_2.html",
+    "href": "project_2.html",
+    "title": "Project2 : 붓꽃 분류",
+    "section": "",
+    "text": "seaborn에서는 붓꽃에 대한 데이터를 제공함\n붓꽃의 품종에 영향을 미치는 요인은 무엇인지 파악하고, 모델 학습을 통해 품종을 예측하고자 함"
+  },
+  {
+    "objectID": "project_2.html#데이터셋",
+    "href": "project_2.html#데이터셋",
+    "title": "Project2 : 붓꽃 분류",
+    "section": "",
+    "text": "seaborn에서는 붓꽃에 대한 데이터를 제공함\n붓꽃의 품종에 영향을 미치는 요인은 무엇인지 파악하고, 모델 학습을 통해 품종을 예측하고자 함"
+  },
+  {
+    "objectID": "project_2.html#학습평가-데이터-분할",
+    "href": "project_2.html#학습평가-데이터-분할",
+    "title": "Project2 : 붓꽃 분류",
+    "section": "3.학습/평가 데이터 분할",
+    "text": "3.학습/평가 데이터 분할\n\n학습 데이터와 평가 데이터를 8:2 비율로 분할\n\n\nX=df.drop(columns='species')   # feature\ny=df['species'] # target\nfrom sklearn.model_selection import train_test_split\nX_train,X_test,y_train,y_test=train_test_split(X,y,test_size=0.2,random_state=42)"
+  },
+  {
+    "objectID": "project_2.html#데이터-탐색",
+    "href": "project_2.html#데이터-탐색",
+    "title": "Project2 : 붓꽃 분류",
+    "section": "4.데이터 탐색",
+    "text": "4.데이터 탐색\n\nX_train.describe()\n\n\n\n\n\n\n\n\nsepal_length\nsepal_width\npetal_length\npetal_width\n\n\n\n\ncount\n120.000000\n120.000000\n120.000000\n120.000000\n\n\nmean\n5.809167\n3.061667\n3.726667\n1.183333\n\n\nstd\n0.823805\n0.449123\n1.752345\n0.752289\n\n\nmin\n4.300000\n2.000000\n1.000000\n0.100000\n\n\n25%\n5.100000\n2.800000\n1.500000\n0.300000\n\n\n50%\n5.750000\n3.000000\n4.250000\n1.300000\n\n\n75%\n6.400000\n3.400000\n5.100000\n1.800000\n\n\nmax\n7.700000\n4.400000\n6.700000\n2.500000\n\n\n\n\n\n\n\n\nsns.pairplot(X_train)\nplt.show()\n# 산점도\n\n\n\n\n\n\n\n\n\n#상자수염 그래프\ndf_train=pd.concat([X_train,y_train],axis=1)\n\nfor i, feature in enumerate(X_train.columns):\n    plt.subplot(2,2,i+1)\n    sns.boxplot(y='species',x=feature, hue ='species',data=df_train)\n    plt.ylabel('')\nplt.show()\n\n\n\n\n\n\n\n\n\n# 산점도\nsns.pairplot(df_train,  hue ='species')\nplt.show()"
+  }
+]
